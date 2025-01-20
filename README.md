@@ -14,7 +14,7 @@ To install the tool, you need to have [Rust](https://www.rust-lang.org/) install
 
 ```bash
 # Clone the repository
-$ git clone <repository-url>
+$ git clone https://github.com/BalaBoi/dirinfo
 
 # Navigate into the project directory
 $ cd dirinfo

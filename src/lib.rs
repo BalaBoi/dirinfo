@@ -21,7 +21,7 @@ impl Dir {
     pub fn info(&self) -> Result<Info> {
         Ok(Info {
             n_files: n_files(&self.path)?,
-            size: self.path.metadata().unwrap().len(),
+            _size: self.path.metadata().unwrap().len(),
         })
     }
 }
@@ -42,11 +42,11 @@ fn n_files(path: &Path) -> Result<usize> {
 
 pub struct Info {
     n_files: usize,
-    size: u64,
+    _size: u64,
 }
 
 impl Info {
     pub fn display(&self, mut writer: impl std::io::Write) -> Result<()>{
-        writeln!(writer, "Number of files: {}\nTotal size: {}", self.n_files, self.size).context("Couldn't write info to writer")
+        writeln!(writer, "Number of files: {}\n", self.n_files).context("Couldn't write info to writer")
     }
 }
