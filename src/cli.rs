@@ -10,6 +10,5 @@ use std::path::PathBuf;
 pub struct Cli {
     ///Path to the directory, defaults to the current directory if omitted
     #[arg(default_value = ".")]
-    pub path: PathBuf
+    pub path: PathBuf,
 }
-
