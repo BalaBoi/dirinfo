@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use dirinfo::{cli::Cli, Dir};
+use dirinfo::{cli::Cli, dir::Dir};
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
