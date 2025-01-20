@@ -12,8 +12,9 @@ impl Info {
     pub fn display(&self, mut writer: impl std::io::Write) -> Result<()> {
         writeln!(
             writer,
-            "Number of files: {}\nLogical size of all the files: {} Bytes\n",
-            self.n_files, self.size
+            "Number of files: {}\nLogical size of all the files: {}\n",
+            self.n_files,
+            file_size::fit_4(self.size)
         )
         .context("Couldn't write info to writer")
     }

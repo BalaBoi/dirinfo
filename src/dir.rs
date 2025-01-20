@@ -14,7 +14,7 @@ impl Dir {
     pub fn validate(path: impl AsRef<Path>) -> Result<Self> {
         let path = path.as_ref();
         if !path.is_dir() {
-            return Err(anyhow!("Directory {} doesn't exist", path.display()));
+            return Err(anyhow!("Directory doesn't exist (dir: {})", path.display()));
         }
         Ok(Self {
             path: path.to_path_buf(),
