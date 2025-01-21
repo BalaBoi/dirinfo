@@ -2,6 +2,8 @@ use assert_cmd::prelude::*;
 use predicates::prelude::*;
 use std::process::Command;
 
+mod utilities;
+
 #[test]
 fn dir_doesnt_exist() -> Result<(), Box<dyn std::error::Error>> {
     let mut cmd = Command::cargo_bin("dirinfo")?;
@@ -23,9 +25,10 @@ fn dir_exists_with_files() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = Command::cargo_bin("dirinfo")?;
     cmd.arg(tmpdir.path());
-    cmd.assert()
-        .success()
-        .stdout(predicate::str::contains("Logical size of all the files: 2468"));
+    cmd.assert().success().stdout(
+        predicate::str::contains("Logical size of all the files: 2468")
+            .and(predicate::str::contains("Number of files: 2")),
+    );
 
     Ok(())
 }
