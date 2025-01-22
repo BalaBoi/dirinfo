@@ -25,12 +25,14 @@ impl Dir {
         let dir_walker = self.read_dir_recursive()?;
         let mut n_files = 0;
         let mut size = 0;
+        let mut n_blocks = 0;
         for f_entry in dir_walker {
             let f_entry = f_entry?;
             n_files += 1;
             size += f_entry.size();
+            n_blocks += f_entry.blocks();
         }
-        Ok(Info::new(size, n_files))
+        Ok(Info::new(size, n_files, n_blocks))
     }
 
     fn read_dir_recursive(&self) -> Result<DirWalker> {

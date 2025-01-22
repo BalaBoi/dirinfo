@@ -1,5 +1,5 @@
 use anyhow::Result;
-use std::{collections::HashSet, fs::ReadDir, os::linux::fs::MetadataExt, path::Path};
+use std::{collections::HashSet, fs::{symlink_metadata, ReadDir}, os::linux::fs::MetadataExt, path::Path};
 
 macro_rules! try_or_return {
     ($x:expr) => {{
@@ -38,15 +38,20 @@ impl FileId {
 
 pub struct FileEntry {
     size: u64,
+    blocks: u64,
 }
 
 impl FileEntry {
-    fn new(size: u64) -> Self {
-        Self { size }
+    fn new(size: u64, blocks: u64) -> Self {
+        Self { size, blocks }
     }
 
     pub fn size(&self) -> u64 {
         self.size
+    }
+
+    pub fn blocks(&self) -> u64 {
+        self.blocks
     }
 }
 
@@ -58,11 +63,12 @@ impl Iterator for DirWalker {
             let mut early_break = false;
             for entry in read_dir {
                 let entry = try_or_return!(entry);
-                let md = try_or_return!(entry.metadata());
-
-                if md.is_symlink() {
+                let md = try_or_return!(symlink_metadata(entry.path()));
+                let file_type = md.file_type();
+                
+                if file_type.is_symlink() {
                     continue; //ignore symlinks
-                } else if md.is_dir() {
+                } else if file_type.is_dir() {
                     let new_read_dir = try_or_return!(entry.path().read_dir());
                     self.read_dir_stack.push(new_read_dir);
                     early_break = true;
@@ -70,12 +76,11 @@ impl Iterator for DirWalker {
                 }
 
                 let f_id = FileId::new(md.st_ino(), md.st_dev());
-                if self.visited_ids.contains(&f_id) {
+                if !self.visited_ids.insert(f_id) {
                     continue;
                 }
-                self.visited_ids.insert(f_id);
 
-                let f_entry = FileEntry::new(md.len());
+                let f_entry = FileEntry::new(md.st_size(), md.st_blocks());
                 return Some(Ok(f_entry));
             }
             if !early_break {

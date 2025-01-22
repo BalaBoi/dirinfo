@@ -1,12 +1,10 @@
-use anyhow::Result;
 use clap::Parser;
-use dirinfo::{cli::Cli, dir::Dir};
+use dirinfo::{cli::Cli, dir::Dir, setup_tracing_subscriber};
 
-fn main() -> Result<()> {
+fn main() {
+    setup_tracing_subscriber();
     let cli = Cli::parse();
-    // println!("Input path: {}", cli.path.display());
-    let dir = Dir::validate(cli.path)?;
-    let info = dir.info()?;
-    info.display(std::io::stdout().lock())?;
-    Ok(())
+    let dir = Dir::validate(cli.path).unwrap();
+    let info = dir.info().unwrap();
+    info.display(std::io::stdout().lock()).unwrap();
 }
