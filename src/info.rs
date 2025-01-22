@@ -9,7 +9,7 @@ impl Info {
     pub fn new(size: u64, n_files: usize) -> Self {
         Self { n_files, size }
     }
-    
+
     pub fn display(&self, mut writer: impl std::io::Write) -> Result<()> {
         writeln!(
             writer,

@@ -1,5 +1,5 @@
-use std::{collections::HashSet, fs::ReadDir, os::linux::fs::MetadataExt, path::Path};
 use anyhow::Result;
+use std::{collections::HashSet, fs::ReadDir, os::linux::fs::MetadataExt, path::Path};
 
 macro_rules! try_or_return {
     ($x:expr) => {{
@@ -25,17 +25,14 @@ impl DirWalker {
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
-pub struct FileId {
+struct FileId {
     inode: u64,
     device: u64,
 }
 
 impl FileId {
     fn new(inode: u64, device: u64) -> Self {
-        Self {
-            inode,
-            device
-        }
+        Self { inode, device }
     }
 }
 
@@ -45,9 +42,7 @@ pub struct FileEntry {
 
 impl FileEntry {
     fn new(size: u64) -> Self {
-        Self {
-            size
-        }
+        Self { size }
     }
 
     pub fn size(&self) -> u64 {
@@ -57,14 +52,14 @@ impl FileEntry {
 
 impl Iterator for DirWalker {
     type Item = Result<FileEntry, std::io::Error>;
-    
+
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(read_dir) = self.read_dir_stack.last_mut() {
             let mut early_break = false;
             for entry in read_dir {
                 let entry = try_or_return!(entry);
                 let md = try_or_return!(entry.metadata());
-                
+
                 if md.is_symlink() {
                     continue; //ignore symlinks
                 } else if md.is_dir() {
@@ -72,8 +67,8 @@ impl Iterator for DirWalker {
                     self.read_dir_stack.push(new_read_dir);
                     early_break = true;
                     break;
-                } 
-                
+                }
+
                 let f_id = FileId::new(md.st_ino(), md.st_dev());
                 if self.visited_ids.contains(&f_id) {
                     continue;
@@ -90,5 +85,3 @@ impl Iterator for DirWalker {
         None
     }
 }
-
-
